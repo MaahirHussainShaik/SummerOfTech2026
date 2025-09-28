@@ -102,3 +102,31 @@ header, .header, .site-header, nav[role="navigation"] {
   display: none !important;
 }
 
+/* Match dropdown menu to theme */
+.themed-select {
+  @apply rounded-xl bg-black/40 border border-white/10 text-white;
+  appearance: none; /* remove default OS styles */
+  padding-right: 2rem; /* leave space for arrow */
+}
+
+/* custom arrow */
+.themed-select::-ms-expand {
+  display: none;
+}
+.themed-select::after {
+  content: '▾';
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: white;
+}
+
+/* style the dropdown options */
+.themed-select option {
+  background-color: #0b0f14; /* dark background */
+  color: white;              /* white text */
+  border-radius: 0.75rem;    /* curved edges */
+  padding: 0.5rem 1rem;
+}
