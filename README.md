@@ -121,9 +121,9 @@ When you open the website:
 
 ---
 
-⚡ **Note**: This is just a **very basic prototype** to demonstrate ideas for Summer of Tech 2026.
+## 📊 User Flow
 
-## User Flow
+```mermaid
 flowchart TD
     A[Home] -->|Select role + Set Role| B{Role}
     B -->|Student| S1[Student Page]
