@@ -1,0 +1,104 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { --bg: #0b0f14; --panel: #0f1720; --card: #0d1320; --text: #e5f4ea; }
+html, body { height: 100%; }
+body { background: radial-gradient(1200px 600px at 20% 10%, #0f1b2a 0%, #0b0f14 60%),
+               radial-gradient(800px 400px at 80% 70%, #0c1a12 0%, #0b0f14 50%), #0b0f14;
+       color: var(--text); font-feature-settings: "ss01"; }
+a { color: #7cf5a1; }
+.card { @apply rounded-2xl shadow-lg p-6 bg-[#0f1720]/80 border border-white/5; }
+.btn { @apply px-4 py-2 rounded-xl bg-brand text-black font-semibold hover:opacity-90 transition; }
+.input { @apply px-3 py-2 rounded-xl bg-black/30 border border-white/10 w-full; }
+.badge { @apply inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-white/10; }
+.table { @apply w-full text-sm; }
+.table th, .table td { @apply px-3 py-2 border-b border-white/10; }
+.starfield {
+  background-image:
+    radial-gradient(1px 1px at 20px 30px, #ffffff55 0, transparent 1px),
+    radial-gradient(1px 1px at 40px 70px, #ffffff55 0, transparent 1px),
+    radial-gradient(1px 1px at 130px 90px, #ffffff55 0, transparent 1px),
+    radial-gradient(1px 1px at 160px 130px, #ffffff55 0, transparent 1px);
+}
+/* Animated green-only gradient */
+.gradient-text--green {
+  background-image: linear-gradient(
+    -45deg,
+    /* Light→Dark green */
+    #c5e8b7, #83d475, #57c84d, #2eb62c,
+    /* Lime → Bright green */
+    #e5ff9a, #dbff74, #cbff58, #b1ee46,
+    /* Neon → Deep green */
+    #4ded30, #26d701, #00c301, #00ab08,
+    /* smooth loop */
+    #83d475, #57c84d, #2eb62c
+  );
+  background-size: 400% 400%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: gradientFlow 12s ease-in-out infinite;
+}
+
+/* Animated violet-only gradient (your three violet sets) */
+.gradient-text--violet {
+  background-image: linear-gradient(
+    -45deg,
+    /* Light→Dark violet */
+    #d4c0d9, #a982b4, #643d6e,
+    /* Violet → Blue-violet */
+    #9600ff, #5512fb,
+    /* Dark violet set */
+    #c900ff, #8900ae, #330040,
+    /* loop back through */
+    #a982b4, #9600ff
+  );
+  background-size: 400% 400%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: gradientFlow 12s ease-in-out infinite;
+}
+
+/* Animated mixed (greens blended with violets for a richer flow) */
+.gradient-text--mixed {
+  background-image: linear-gradient(
+    -45deg,
+    /* start green family */
+    #c5e8b7, #83d475, #57c84d, #2eb62c,
+    #e5ff9a, #dbff74, #cbff58, #b1ee46,
+    #4ded30, #26d701, #00c301, #00ab08,
+    /* transition into violets */
+    #d4c0d9, #a982b4, #643d6e,
+    #9600ff, #5512fb,
+    #c900ff, #8900ae, #330040,
+    /* back to green for seamless loop */
+    #83d475, #57c84d, #2eb62c
+  );
+  background-size: 600% 600%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: gradientFlow 16s ease-in-out infinite;
+}
+
+/* subtle glow so it still reads white-ish while colors move */
+.drop-glow {
+  text-shadow:
+    0 0 6px rgba(255,255,255,0.14),
+    0 0 18px rgba(124,245,161,0.18);
+}
+
+@keyframes gradientFlow {
+  0%   { background-position: 0% 50%;   }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%;   }
+}
+
+/* Remove headbar / header if present (no code changes needed) */
+header, .header, .site-header, nav[role="navigation"] {
+  display: none !important;
+}
+
