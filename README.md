@@ -31,7 +31,7 @@ When you open the website:
    - Once you apply, the job automatically appears in the **“Jobs I’ve applied”** list.  
 
 3. **Upload CV**
-   - Next, you need to upload your **CV (.txt only)**.  
+   - Next, you need to upload your **CV (.txt only)** (The Cv is available in the https://github.com/MaahirHussainShaik/helperfiles.git to download)
    - I have attached my own CV for demo purposes.  
    - After uploading, your applied jobs are **ranked** by their match with your CV.  
    - In the **Event Recommendations** section, you will see a guide that tells you which companies to prioritise first at the event.  
@@ -121,27 +121,4 @@ When you open the website:
 
 ---
 
-## 📊 User Flow
 
-```mermaid
-flowchart TD
-    A[Home] -->|Select role + Set Role| B{Role}
-    B -->|Student| S1[Student Page]
-    B -->|Employer| E1[Employer Page]
-
-    %% Student branch
-    S1 --> S2[Browse Jobs]
-    S2 -->|View JD + FAQs + add 3 Qs| S3[Job Detail]
-    S3 -->|Apply| S4[Applied Jobs (ranked)]
-    S1 -->|Apply from list| S4
-    S4 --> S5[Upload CV (.txt)]
-    S5 --> S6[Jobs Ranked]
-    S6 --> S7[Event Recommendations]
-    S4 --> S8[Per-job QR (JSON) + Notes]
-
-    %% Employer branch
-    E1 --> E2[Pick a Job]
-    E2 --> E3[Edit & Save 7 FAQs]
-    E2 --> E4[Employer QR (JSON)]
-    E1 --> E5[Scan Student QR (upload JSON)]
-    E5 --> E6[View Student Profile + Their Questions + 5-min Timer]
