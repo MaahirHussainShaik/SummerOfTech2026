@@ -1,6 +1,7 @@
 'use client';
 import RoleGuard from '@/components/RoleGuard';
 import { onejobs } from '@/lib/mock';
+import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { QRCodeCanvas } from 'qrcode.react';
 
@@ -31,17 +32,12 @@ type StudentQRPerJob = {
 
 type ScannedQuestionGroup = { label: string; list: string[]; score?: number };
 
-// ---------- Type guards (fixes “property X does not exist” errors) ----------
+// ---------- Type guards ----------
 function isRecord(v: unknown): v is Record<string, unknown> {
   return !!v && typeof v === 'object';
 }
 function isStudentProfile(v: unknown): v is StudentQRProfile {
-  return (
-    isRecord(v) &&
-    v.type === 'student' &&
-    typeof v.id === 'string' &&
-    typeof v.name === 'string'
-  );
+  return isRecord(v) && v.type === 'student' && typeof v.id === 'string' && typeof v.name === 'string';
 }
 function isStudentPerJob(v: unknown): v is StudentQRPerJob {
   return (
@@ -61,7 +57,6 @@ function normalizeFaq(f: AnyFAQ): { q: string; a: string } {
   };
 }
 
-// Your “same 7 questions for every job”
 const COMMON_7 = [
   'What does your company do?',
   'What roles are you offering?',
@@ -73,7 +68,6 @@ const COMMON_7 = [
 ].map((q) => ({ q, a: '' }));
 
 function faqsForJob(_jobId: string) {
-  // Always return the same 7, normalized
   return COMMON_7.map(normalizeFaq);
 }
 
@@ -81,7 +75,7 @@ function faqsForJob(_jobId: string) {
 function labelFromPayload(jobId?: string, employer?: string, jobTitle?: string) {
   if (employer || jobTitle) return [employer, jobTitle].filter(Boolean).join(' — ');
   const j = jobId ? onejobs.find((x) => x.id === jobId) : null;
-  return j ? `${j.employerName} — ${j.title}` : (jobId || 'Job');
+  return j ? `${j.employerName} — ${j.title}` : jobId || 'Job';
 }
 
 export default function EmployerPage() {
@@ -161,9 +155,7 @@ export default function EmployerPage() {
   useEffect(() => {
     if (hasStarted) {
       if (timerRef.current) clearInterval(timerRef.current);
-      timerRef.current = setInterval(() => {
-        setCountdown((c) => (c > 0 ? c - 1 : 0));
-      }, 1000);
+      timerRef.current = setInterval(() => setCountdown((c) => (c > 0 ? c - 1 : 0)), 1000);
     }
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
@@ -176,7 +168,6 @@ export default function EmployerPage() {
       const text = await file.text();
       const raw = JSON.parse(text) as unknown;
 
-      // Narrow to either profile or per-job
       if (isStudentProfile(raw) || isStudentPerJob(raw)) {
         const skills = Array.isArray(raw.skills) ? raw.skills : [];
         setScanInfo({ id: raw.id, name: raw.name, skills });
@@ -184,23 +175,17 @@ export default function EmployerPage() {
         const groups: ScannedQuestionGroup[] = [];
 
         if (isStudentProfile(raw)) {
-          // questions: Record<jobId, string[]>
           if (raw.questions && isRecord(raw.questions)) {
             for (const [k, arr] of Object.entries(raw.questions)) {
               if (Array.isArray(arr) && arr.length) {
-                groups.push({
-                  label: labelFromPayload(k),
-                  list: arr.filter(Boolean),
-                });
+                groups.push({ label: labelFromPayload(k), list: arr.filter(Boolean) });
               }
             }
           }
         } else if (isStudentPerJob(raw)) {
-          // per-job QR
-          const list = Array.isArray(raw.questions) ? raw.questions.filter(Boolean) : [];
           groups.push({
             label: labelFromPayload(raw.jobId, raw.employer, raw.jobTitle),
-            list,
+            list: Array.isArray(raw.questions) ? raw.questions.filter(Boolean) : [],
             score: typeof raw.score === 'number' ? raw.score : undefined,
           });
         }
@@ -241,7 +226,17 @@ export default function EmployerPage() {
 
   return (
     <RoleGuard allow={['employer']}>
-      <div className="grid gap-6">
+      {/* ---------- Headbar (same style as Student page) ---------- */}
+      <div className="sticky top-0 z-10 backdrop-blur bg-black/20 border-b border-white/10">
+        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+          <div className="text-xl md:text-2xl font-bold text-transparent bg-clip-text gradient-text--mixed">
+            Summer of Tech 2026
+          </div>
+          <Link href="/" className="badge hover:opacity-80">Home</Link>
+        </div>
+      </div>
+
+      <div className="grid gap-6 max-w-6xl mx-auto px-4 mt-6">
         {/* Your Roles */}
         <div className="card">
           <h2 className="text-xl font-semibold mb-2">Your Roles</h2>
@@ -303,18 +298,26 @@ export default function EmployerPage() {
           </p>
         </div>
 
-        {/* Scan student QR → timer + approve/not + show questions (+score) */}
+        {/* Scan student QR → timer + approve/not + show questions (+score if present) */}
         <div className="card">
           <h3 className="text-lg font-semibold mb-2">Scan Student QR (upload JSON)</h3>
           <p className="text-sm opacity-80 mb-3">
             Upload the <b>student QR JSON</b> (profile or per-job) to start a timed conversation.
           </p>
-          <input
-            type="file"
-            accept=".json,application/json"
-            onChange={(e) => handleUploadQR(e.target.files?.[0] || undefined)}
-            className="mb-4"
-          />
+
+          {/* Styled like Student page: moving green gradient button + hidden input */}
+          <div className="mb-4">
+            <label className="moving-green-btn inline-flex items-center justify-center px-3 py-2 rounded-xl cursor-pointer select-none text-black font-semibold">
+              Choose file
+              <input
+                type="file"
+                accept=".json,application/json"
+                onChange={(e) => handleUploadQR(e.target.files?.[0] || undefined)}
+                className="hidden"
+              />
+            </label>
+          </div>
+
           {!scanInfo && <div className="text-sm opacity-70">No scan loaded yet.</div>}
           {scanInfo && (
             <div className="space-y-4">
@@ -416,6 +419,34 @@ export default function EmployerPage() {
           )}
         </div>
       </div>
+
+      {/* Moving gradient for the “Choose file” button (reuse Student style) */}
+      <style jsx global>{`
+        .moving-green-btn {
+          background: linear-gradient(
+            135deg,
+            #c5e8b7,
+            #83d475,
+            #57c84d,
+            #2eb62c,
+            #b1ee46,
+            #cbff58,
+            #dbff74,
+            #e5ff9a,
+            #4ded30,
+            #26d701,
+            #00c301,
+            #00ab08
+          );
+          background-size: 300% 300%;
+          animation: gradientShift 6s ease infinite;
+        }
+        @keyframes gradientShift {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+      `}</style>
     </RoleGuard>
   );
 }

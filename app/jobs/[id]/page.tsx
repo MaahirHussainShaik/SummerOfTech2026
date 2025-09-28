@@ -28,7 +28,7 @@ Build real features with real impact
 Learn how AI enhances code, testing, and deployment
 Contribute ideas and grow in a supportive team
 Explore how automation and AI can change the way we work
-Experiment with modern frameworks and infrastructure like Next.js and containers, as well as AI-powered coding tools like Cursor and Claude`
+Experiment with modern frameworks and infrastructure like Next.js and containers, as well as AI-powered coding tools like Cursor and Claude`,
   },
   'one-nz-ai-pe': {
     id: 'one-nz-ai-pe',
@@ -57,7 +57,7 @@ Ways of working
 Agile collaboration and focus on outcomes. Behaviours: HEART, GRIT & FREEDOM.
 
 Security & privacy
-Follow One NZ policies and report possible breaches promptly.`
+Follow One NZ policies and report possible breaches promptly.`,
   },
   'trademe-fs-intern': {
     id: 'trademe-fs-intern',
@@ -92,8 +92,8 @@ Perks:
 - Great office perks
 - Flexible working
 - Big-brand experience
-- Innovative, supportive culture`
-  }
+- Innovative, supportive culture`,
+  },
 } as const;
 
 // 7 FAQs per job (as provided)
@@ -172,12 +172,21 @@ export default function JobDetailPage({ params }: { params: { id: string } }) {
   }
 
   const updateQ = (i: number, v: string) => setQs((prev) => prev.map((x, idx) => (idx === i ? v : x)));
+
+  // ✅ Keep APPLY inside the component so it can see job / qs / router.
   const apply = () => {
-    // Store the user’s questions per job in localStorage (simple demo persistence)
-    const key = 'student_job_questions';
-    const existing = JSON.parse(localStorage.getItem(key) || '{}');
+    // Save the user’s questions per job
+    const qKey = 'student_job_questions';
+    const existing = JSON.parse(localStorage.getItem(qKey) || '{}');
     existing[job.id] = qs;
-    localStorage.setItem(key, JSON.stringify(existing));
+    localStorage.setItem(qKey, JSON.stringify(existing));
+
+    // Mark as applied so it appears in the Student page “Jobs I’ve applied”
+    const aKey = 'student_applied_job_ids';
+    const arr = JSON.parse(localStorage.getItem(aKey) || '[]');
+    const next = Array.isArray(arr) ? Array.from(new Set([...arr, job.id])) : [job.id];
+    localStorage.setItem(aKey, JSON.stringify(next));
+
     alert('Applied + questions saved (included in your per-job QR on the student page).');
     router.push('/student');
   };
@@ -206,7 +215,9 @@ export default function JobDetailPage({ params }: { params: { id: string } }) {
           <ul className="space-y-3">
             {faqs.map((f, i) => (
               <li key={i} className="p-3 rounded-xl border border-white/10 bg-black/20">
-                <div className="font-medium">{i + 1}. {f.q}</div>
+                <div className="font-medium">
+                  {i + 1}. {f.q}
+                </div>
                 <div className="text-sm opacity-90 mt-1">{f.a}</div>
               </li>
             ))}
@@ -219,12 +230,7 @@ export default function JobDetailPage({ params }: { params: { id: string } }) {
         <h3 className="font-semibold mb-2">Your questions to ask</h3>
         <div className="space-y-2">
           {qs.map((q, i) => (
-            <input
-              key={i}
-              className="input w-full"
-              value={q}
-              onChange={(e) => updateQ(i, e.target.value)}
-            />
+            <input key={i} className="input w-full" value={q} onChange={(e) => updateQ(i, e.target.value)} />
           ))}
         </div>
         <button className="btn mt-3" onClick={apply}>
